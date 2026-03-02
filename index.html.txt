@@ -804,4 +804,86 @@
             }
             if (screen === 'reports') updateReportsList();
             if (screen === 'profile') updateProfile();
-            if (screen === 'new-inspection') { populateProtocolSelect
+            if (screen === 'new-inspection') { populateProtocolSelect(); currentItemPhotos = {}; }
+        });
+    });
+
+    document.getElementById('quick-new').addEventListener('click', () => showScreen('new-inspection'));
+    document.getElementById('quick-reports').addEventListener('click', () => showScreen('reports'));
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        currentUser = null;
+        localStorage.removeItem(STORAGE_USER);
+        showScreen('login');
+    });
+
+    document.getElementById('generate-report-btn').addEventListener('click', async () => {
+        const address = document.getElementById('prop-address').value;
+        const type = document.getElementById('prop-type').value;
+        const size = document.getElementById('prop-size').value;
+        const age = document.getElementById('prop-age').value;
+        const protocolId = parseInt(document.getElementById('inspection-protocol').value);
+        const protocol = protocols.find(p => p.id === protocolId);
+        if (!protocol.free) {
+            alert('This protocol is locked. Upgrade to Pro.');
+            return;
+        }
+        
+        const ratings = [];
+        document.querySelectorAll('#rating-section input[type="number"]').forEach(input => {
+            ratings.push(parseInt(input.value) || 5);
+        });
+        
+        const newAssessment = {
+            id: inspections.length + 1,
+            propertyAddress: address,
+            propertyType: type,
+            size,
+            age,
+            protocolId,
+            protocolName: protocol.name,
+            ratings,
+            photosByItem: currentItemPhotos,
+            createdAt: new Date().toISOString(),
+            userId: currentUser.id
+        };
+        inspections.push(newAssessment);
+        saveLocalData();
+        generatePDF(newAssessment, true);
+        updateDashboard();
+        updateReportsList();
+        document.getElementById('prop-address').value = '';
+        document.getElementById('rating-section').innerHTML = '';
+        currentItemPhotos = {};
+        alert('Inspection saved and PDF generated.');
+    });
+
+    const upgradeModal = document.getElementById('upgrade-modal');
+    document.getElementById('modal-close').addEventListener('click', () => upgradeModal.classList.remove('show'));
+    document.getElementById('modal-upgrade').addEventListener('click', () => {
+        alert('Upgrade coming soon!');
+        upgradeModal.classList.remove('show');
+    });
+
+    window.showPurchaseModal = () => upgradeModal.classList.add('show');
+
+    if (currentUser) {
+        showScreen('dashboard');
+        updateDashboard();
+        updateReportsList();
+        updateProfile();
+        populateProtocolSelect();
+    } else {
+        showScreen('login');
+    }
+})();
+</script>
+<!-- Footer with About link -->
+<div style="text-align: center; padding: 10px; font-size: 0.8rem; background: rgba(255,255,255,0.5); margin-top: 10px;">
+    <a href="/about.html" style="color: #0B1C3F; margin: 0 10px; text-decoration: none; font-weight: bold;">📋 About PIPS Pro</a> |
+    <a href="/privacy.html" style="color: #0B1C3F; margin: 0 10px; text-decoration: none;">Privacy</a> |
+    <a href="/terms.html" style="color: #0B1C3F; margin: 0 10px; text-decoration: none;">Terms</a> |
+    <a href="/refund.html" style="color: #0B1C3F; margin: 0 10px; text-decoration: none;">Refund</a>
+    <p style="margin-top: 5px; color: #666;">© 2026 Property Inspection Profit System™ · By Ali Sekhr</p>
+</div>
+</body>
+</html>
