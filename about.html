@@ -67,6 +67,30 @@
             padding-left: 15px;
         }
         
+        .nav-bar {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #FFD700;
+        }
+        
+        .nav-links a {
+            color: #0B1C3F;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #FFD700;
+        }
+        
+        .nav-links a:first-child {
+            margin-left: 0;
+        }
+        
         .content {
             padding: 40px;
         }
@@ -131,7 +155,41 @@
             margin-bottom: 0;
         }
         
-        .tier-table {
+        .tier-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .tier-box {
+            flex: 1;
+            min-width: 120px;
+            background: #0B1C3F;
+            color: white;
+            padding: 20px 15px;
+            border-radius: 20px;
+            text-align: center;
+            border-bottom: 4px solid #FFD700;
+        }
+        
+        .tier-box .tier-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFD700;
+        }
+        
+        .tier-box .tier-name {
+            font-weight: 600;
+            margin: 10px 0 5px;
+        }
+        
+        .tier-box .tier-desc {
+            font-size: 0.8rem;
+            color: #b0c4de;
+        }
+        
+        .pricing-table {
             background: white;
             border-radius: 24px;
             overflow: hidden;
@@ -139,31 +197,30 @@
             margin: 30px 0;
         }
         
-        .tier-row {
+        .pricing-row {
             display: grid;
             grid-template-columns: 120px 1fr 100px;
             border-bottom: 1px solid #e0e7ed;
             padding: 15px 20px;
         }
         
-        .tier-row:last-child {
+        .pricing-row:last-child {
             border-bottom: none;
         }
         
-        .tier-row.header {
+        .pricing-row.header {
             background: #0B1C3F;
             color: white;
             font-weight: 600;
             border-bottom: 2px solid #FFD700;
-            padding: 15px 20px;
         }
         
-        .tier-name {
+        .plan-name {
             font-weight: 700;
             color: #0B1C3F;
         }
         
-        .tier-price {
+        .plan-price {
             color: #FFD700;
             font-weight: 700;
             text-align: right;
@@ -183,7 +240,7 @@
             transition: 0.1s;
             text-decoration: none;
             display: inline-block;
-            margin: 20px 0;
+            margin: 10px;
         }
         
         .btn-gold:hover {
@@ -202,6 +259,7 @@
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            margin: 10px;
         }
         
         .footer {
@@ -232,31 +290,12 @@
             font-size: 0.9rem;
         }
         
-        .nav-bar {
-            background: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #FFD700;
-        }
-        
-        .nav-links a {
-            color: #0B1C3F;
-            text-decoration: none;
-            margin-left: 25px;
-            font-weight: 500;
-        }
-        
-        .nav-links a:hover {
-            color: #FFD700;
-        }
-        
         @media (max-width: 600px) {
             .header h1 { font-size: 2rem; }
             .content { padding: 25px; }
             .feature-grid { grid-template-columns: 1fr; }
-            .tier-row { grid-template-columns: 1fr 1fr; }
+            .pricing-row { grid-template-columns: 1fr 1fr; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
@@ -266,9 +305,10 @@
         <div class="nav-bar">
             <div style="font-weight: 700; color: #0B1C3F;">PIPS Pro™</div>
             <div class="nav-links">
-                <a href="index.html">App</a>
-                <a href="#about">About</a>
+                <a href="/">Home</a>
+                <a href="#features">Features</a>
                 <a href="#pricing">Pricing</a>
+                <a href="/index.html">Launch App</a>
             </div>
         </div>
         
@@ -284,11 +324,12 @@
             <div class="section" style="text-align: center;">
                 <h2>Transform Your Property Inspections</h2>
                 <p style="font-size: 1.2rem; max-width: 600px; margin: 20px auto;">The complete assessment platform for serious property investors and professional surveyors.</p>
-                <a href="index.html" class="btn-gold"><i class="fas fa-arrow-right"></i> Launch the App</a>
+                <a href="/index.html" class="btn-gold"><i class="fas fa-arrow-right"></i> Launch the App</a>
+                <a href="#features" class="btn-secondary"><i class="fas fa-info-circle"></i> Learn More</a>
             </div>
             
             <!-- What is PIPS Pro -->
-            <div class="section">
+            <div class="section" id="features">
                 <h2>What is PIPS Pro?</h2>
                 <p>PIPS Pro™ (Property Inspection Profit System) is a comprehensive property assessment platform designed for property investors, surveyors, and inspection professionals. It provides 38 structured protocols across 5 tiers for evaluating properties using a rating‑based methodology (0‑10 scale).</p>
                 <p>The platform includes photo annotation with drawing tools, automated PDF report generation, and full assessment history. Unlike simple checklists, PIPS Pro™ gives you nuanced, data‑driven insights for better investment decisions.</p>
@@ -334,63 +375,63 @@
             <!-- The 5 Tiers -->
             <div class="section">
                 <h2>The 5 Tiers of Assessment</h2>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
-                    <div style="flex: 1; min-width: 150px; background: #0B1C3F; color: white; padding: 15px; border-radius: 20px; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: #FFD700;">Tier 1</div>
-                        <div>Critical Foundation</div>
-                        <div style="font-size: 0.8rem;">6 protocols · weight 2.0</div>
+                <div class="tier-grid">
+                    <div class="tier-box">
+                        <div class="tier-number">T1</div>
+                        <div class="tier-name">Critical Foundation</div>
+                        <div class="tier-desc">6 protocols · weight 2.0</div>
                     </div>
-                    <div style="flex: 1; min-width: 150px; background: #1a3352; color: white; padding: 15px; border-radius: 20px; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: #FFD700;">Tier 2</div>
-                        <div>Core Systems</div>
-                        <div style="font-size: 0.8rem;">8 protocols · weight 1.75</div>
+                    <div class="tier-box">
+                        <div class="tier-number">T2</div>
+                        <div class="tier-name">Core Systems</div>
+                        <div class="tier-desc">8 protocols · weight 1.75</div>
                     </div>
-                    <div style="flex: 1; min-width: 150px; background: #2a4565; color: white; padding: 15px; border-radius: 20px; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: #FFD700;">Tier 3</div>
-                        <div>Detailed Assessment</div>
-                        <div style="font-size: 0.8rem;">12 protocols · weight 1.5</div>
+                    <div class="tier-box">
+                        <div class="tier-number">T3</div>
+                        <div class="tier-name">Detailed Assessment</div>
+                        <div class="tier-desc">12 protocols · weight 1.5</div>
                     </div>
-                    <div style="flex: 1; min-width: 150px; background: #3a5780; color: white; padding: 15px; border-radius: 20px; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: #FFD700;">Tier 4</div>
-                        <div>Advanced Analysis</div>
-                        <div style="font-size: 0.8rem;">8 protocols · weight 1.25</div>
+                    <div class="tier-box">
+                        <div class="tier-number">T4</div>
+                        <div class="tier-name">Advanced Analysis</div>
+                        <div class="tier-desc">8 protocols · weight 1.25</div>
                     </div>
-                    <div style="flex: 1; min-width: 150px; background: #4a6a95; color: white; padding: 15px; border-radius: 20px; text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: #FFD700;">Tier 5</div>
-                        <div>Specialised</div>
-                        <div style="font-size: 0.8rem;">4 protocols · weight 1.0</div>
+                    <div class="tier-box">
+                        <div class="tier-number">T5</div>
+                        <div class="tier-name">Specialised</div>
+                        <div class="tier-desc">4 protocols · weight 1.0</div>
                     </div>
                 </div>
             </div>
             
             <!-- Pricing Overview -->
-            <div class="section">
+            <div class="section" id="pricing">
                 <h2>Simple, Transparent Pricing</h2>
-                <div class="tier-table">
-                    <div class="tier-row header">
-                        <div>Tier</div>
+                <div class="pricing-table">
+                    <div class="pricing-row header">
+                        <div>Plan</div>
                         <div>Features</div>
                         <div>Price</div>
                     </div>
-                    <div class="tier-row">
-                        <div class="tier-name">Freemium</div>
+                    <div class="pricing-row">
+                        <div class="plan-name">Freemium</div>
                         <div>3 protocols · 3 assessments/month</div>
-                        <div class="tier-price">Free</div>
+                        <div class="plan-price">Free</div>
                     </div>
-                    <div class="tier-row">
-                        <div class="tier-name">Basic</div>
+                    <div class="pricing-row">
+                        <div class="plan-name">Basic</div>
                         <div>14 protocols · 10 assessments/month</div>
-                        <div class="tier-price">£19.99/mo</div>
+                        <div class="plan-price">£19.99/mo</div>
                     </div>
-                    <div class="tier-row">
-                        <div class="tier-name">Pro</div>
+                    <div class="pricing-row">
+                        <div class="plan-name">Pro</div>
                         <div>26 protocols · unlimited assessments</div>
-                        <div class="tier-price">£99/mo</div>
+                        <div class="plan-price">£99/mo</div>
                     </div>
-                    <div class="tier-row">
-                        <div class="tier-name">Business</div>
+                    <div class="pricing-row">
+                        <div class="plan-name">Business</div>
                         <div>All 38 protocols · team · white‑label</div>
-                        <div class="tier-price">£299/mo</div>
+                        <div class="plan-price">£299/mo</div>
                     </div>
                 </div>
                 <p style="font-size: 0.9rem; color: #666;">Annual plans available with 16% discount. All plans include a 14‑day free trial.</p>
@@ -399,7 +440,7 @@
             <!-- Call to Action -->
             <div style="text-align: center; margin: 50px 0 30px;">
                 <h3 style="color: #0B1C3F; margin-bottom: 20px;">Ready to get started?</h3>
-                <a href="index.html" class="btn-gold" style="margin-right: 15px;"><i class="fas fa-rocket"></i> Launch App</a>
+                <a href="/index.html" class="btn-gold"><i class="fas fa-rocket"></i> Launch App</a>
                 <a href="#contact" class="btn-secondary"><i class="fas fa-envelope"></i> Contact Sales</a>
             </div>
         </div>
@@ -410,10 +451,11 @@
                 <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> London · Dubai
             </div>
             <div class="footer-links">
-                <a href="privacy.html">Privacy</a> |
-                <a href="terms.html">Terms</a> |
-                <a href="refund.html">Refund</a> |
-                <a href="index.html">App</a>
+                <a href="/privacy.html">Privacy</a> |
+                <a href="/terms.html">Terms</a> |
+                <a href="/refund.html">Refund</a> |
+                <a href="/index.html">App</a> |
+                <a href="/about.html">About</a>
             </div>
             <div style="margin-top: 20px; font-size: 0.8rem; color: #b0c4de;">
                 © 2026 Property Inspection Profit System™ · By Ali Sekhr
