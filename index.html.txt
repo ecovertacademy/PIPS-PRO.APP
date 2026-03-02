@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>PIPS Pro™ · Property Inspection Profit System (Phase 1)</title>
+    <title>PIPS Pro™ · Property Inspection Profit System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* EXQUISITE DESIGN – same as before */
         * {
             margin: 0;
             padding: 0;
@@ -198,10 +197,10 @@
             margin: 10px 0;
         }
         .photo-thumb {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 2px solid #FFD700;
             position: relative;
         }
@@ -216,9 +215,9 @@
             right: 0;
             background: rgba(11,28,63,0.8);
             color: #FFD700;
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             text-align: center;
-            border-radius: 0 0 16px 16px;
+            border-radius: 0 0 12px 12px;
             cursor: pointer;
         }
         .modal {
@@ -287,15 +286,38 @@
         }
         .rating-item {
             display: flex;
+            flex-direction: column;
+            margin: 12px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #7C9EB2;
+        }
+        .rating-item-header {
+            display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 6px 0;
         }
-        .rating-item input {
+        .rating-item-header input {
             width: 70px;
-            margin-left: 10px;
             padding: 8px;
             border-radius: 20px;
+        }
+        .item-photos {
+            margin-top: 10px;
+            padding: 10px;
+            background: #eef3f7;
+            border-radius: 12px;
+        }
+        .add-photo-btn {
+            background: #7C9EB2;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 5px;
         }
         #login-screen {
             display: flex;
@@ -345,7 +367,7 @@
             </div>
         </div>
 
-        <!-- PROTOCOLS LIBRARY (list + detail) -->
+        <!-- PROTOCOLS LIBRARY -->
         <div id="protocols-screen" class="screen">
             <div id="protocols-list-view">
                 <h3 style="color:#0B1C3F;">📋 Protocol Library</h3>
@@ -358,7 +380,7 @@
             </div>
         </div>
 
-        <!-- NEW INSPECTION (with rating and annotation) -->
+        <!-- NEW INSPECTION -->
         <div id="new-inspection-screen" class="screen">
             <h3 style="color:#0B1C3F;">🏠 New Inspection</h3>
             <div class="card">
@@ -377,12 +399,8 @@
                 <label>Select protocol</label>
                 <select id="inspection-protocol"></select>
                 
-                <!-- Rating section (dynamic) -->
+                <!-- Rating section with per‑item photos -->
                 <div id="rating-section" style="margin-top: 20px;"></div>
-
-                <label>Photos <small>(tap to add, max 3 per dimension)</small></label>
-                <input type="file" id="photo-input" accept="image/*" capture="camera" multiple>
-                <div class="photo-grid" id="photo-preview"></div>
 
                 <button class="btn btn-gold" id="generate-report-btn"><i class="fas fa-file-pdf"></i> Generate Report & Save</button>
             </div>
@@ -394,7 +412,7 @@
             <div id="reports-list"></div>
         </div>
 
-        <!-- PROFILE (simplified, no white‑label/team) -->
+        <!-- PROFILE -->
         <div id="profile-screen" class="screen">
             <div class="card">
                 <h4><i class="fas fa-user-circle"></i> Inspector Profile</h4>
@@ -409,7 +427,7 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAV (5 screens) -->
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav" id="bottom-nav" style="display: none;">
         <div class="nav-item" data-screen="dashboard"><i class="fas fa-home"></i>Home</div>
         <div class="nav-item" data-screen="protocols"><i class="fas fa-book"></i>Protocols</div>
@@ -419,7 +437,7 @@
     </div>
 </div>
 
-<!-- UPGRADE MODAL (simple placeholder – no Stripe yet) -->
+<!-- UPGRADE MODAL -->
 <div id="upgrade-modal" class="modal">
     <div class="modal-content">
         <h3 style="color:#0B1C3F;">🔒 Protocol Locked</h3>
@@ -429,7 +447,7 @@
     </div>
 </div>
 
-<!-- ANNOTATION MODAL (unchanged) -->
+<!-- ANNOTATION MODAL -->
 <div id="annotation-modal" class="modal">
     <div class="modal-content annotation-modal" style="background:#2d2d2d; color:white;">
         <h3 style="color:#FFD700;">Annotate Photo</h3>
@@ -448,15 +466,24 @@
 <script>
 (function() {
     // ==================== CONFIG ====================
-    const API_BASE = 'https://your-backend.com/api';  // Replace with your Phase 1 backend URL
+    const API_BASE = 'https://your-backend.com/api';  // Replace with your backend URL
     const USE_REAL_API = false; // Set to true when backend is ready
 
-    // ==================== MOCK DATA & LOCALSTORAGE FALLBACK ====================
-    // Full 38 protocols (same as before – keep embedded for demo)
-    const protocolsData = [ /* ... insert the full 38 protocols array from previous answer ... */ ];
-    // For brevity, we'll assume you have the full array. In practice, copy from the earlier message.
-    // Mark first 3 as free
-    const protocols = protocolsData.map(p => ({ ...p, free: p.id <= 3 }));
+    // ==================== MOCK PROTOCOLS ====================
+    const protocolsData = [
+        { id: 1, tier: 'T1', code: 'P01', name: 'Strategic Assessment Protocol', description: 'Strategic property assessment', weight: '2.0', free: true, dimensions: [
+            { name: 'Location Analysis', items: ['Transport Links', 'Local Amenities', 'Employment Hubs'], redFlags: ['High crime area'] },
+            { name: 'Market Positioning', items: ['Price Point', 'Target Demographic'], redFlags: ['Overpriced'] }
+        ]},
+        { id: 2, tier: 'T1', code: 'P02', name: 'Foundation Assessment Protocol', description: 'Foundation integrity', weight: '2.0', free: true, dimensions: [
+            { name: 'Foundation Type', items: ['Type identified', 'Construction quality'], redFlags: ['Cracks >5mm'] }
+        ]},
+        { id: 3, tier: 'T1', code: 'P03', name: 'Structural Movement', description: 'Subsidence risks', weight: '2.0', free: true, dimensions: [] },
+        { id: 4, tier: 'T1', code: 'P04', name: 'Environmental Hazards', description: 'Contamination', weight: '2.0', free: false, dimensions: [] },
+        { id: 5, tier: 'T1', code: 'P05', name: 'Investment Analysis', description: 'Financial analysis', weight: '2.0', free: false, dimensions: [] },
+        { id: 6, tier: 'T1', code: 'P06', name: 'Comparable Analysis', description: 'Market comparison', weight: '2.0', free: false, dimensions: [] }
+    ];
+    const protocols = protocolsData.map(p => ({ ...p, free: p.free }));
 
     // LocalStorage keys
     const STORAGE_USER = 'pips_user';
@@ -480,7 +507,7 @@
 
     loadLocalData();
 
-    // ==================== API CLIENT (stub) ====================
+    // ==================== API CLIENT STUB ====================
     const api = {
         async login(email, password) {
             if (USE_REAL_API) {
@@ -495,146 +522,228 @@
                 localStorage.setItem(STORAGE_TOKEN, authToken);
                 return data.user;
             } else {
-                // mock
                 return { id: 1, email, name: email.split('@')[0], tier: 'freemium' };
             }
         },
         async register(email, password) {
-            // similar
             return this.login(email, password);
         },
         async getProtocols() {
-            if (USE_REAL_API) {
-                const res = await fetch(`${API_BASE}/protocols/list`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-                return res.json();
-            } else {
-                return protocols;
-            }
+            return protocols;
         },
         async createAssessment(data) {
-            if (USE_REAL_API) {
-                const res = await fetch(`${API_BASE}/assessments/create`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                return res.json();
-            } else {
-                const newId = inspections.length + 1;
-                const assessment = { id: newId, ...data, userId: currentUser.id, status: 'in_progress', createdAt: new Date() };
-                inspections.push(assessment);
-                saveLocalData();
-                return assessment;
-            }
+            const newId = inspections.length + 1;
+            const assessment = { id: newId, ...data, userId: currentUser.id, status: 'in_progress', createdAt: new Date() };
+            inspections.push(assessment);
+            saveLocalData();
+            return assessment;
         },
-        async saveRating(data) {
-            if (USE_REAL_API) {
-                await fetch(`${API_BASE}/assessments/saveRating`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            } else {
-                // store in localStorage – we'll just keep in memory for demo
-                console.log('Saved rating (local)', data);
-            }
-        },
-        async getAssessment(id) {
-            if (USE_REAL_API) {
-                const res = await fetch(`${API_BASE}/assessments/get?id=${id}`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-                return res.json();
-            } else {
-                return inspections.find(a => a.id === id);
-            }
-        },
-        // Photo upload: get pre-signed URL
-        async getPhotoUploadUrl(assessmentId, dimensionId, fileName, contentType) {
-            if (USE_REAL_API) {
-                const res = await fetch(`${API_BASE}/photos/getUploadUrl`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ assessmentId, dimensionId, fileName, contentType })
-                });
-                return res.json(); // { url, key }
-            } else {
-                // mock – return fake signed URL
-                return { url: '#', key: `mock/${fileName}` };
-            }
-        },
-        async confirmPhotoUpload(assessmentId, dimensionId, s3Key) {
-            if (USE_REAL_API) {
-                await fetch(`${API_BASE}/photos/confirmUpload`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ assessmentId, dimensionId, s3Key })
-                });
-            } else {
-                console.log('Photo confirmed (local)', { assessmentId, dimensionId, s3Key });
-            }
-        }
+        async saveRating(data) { console.log('Saved rating (local)', data); },
+        async getAssessment(id) { return inspections.find(a => a.id === id); },
+        async getPhotoUploadUrl() { return { url: '#', key: 'mock' }; },
+        async confirmPhotoUpload() { console.log('Photo confirmed'); }
     };
 
     // ==================== UI STATE ====================
-    let currentAssessmentId = null; // for new inspection
-    let photosArray = []; // temporary for current dimension
+    let currentAssessmentId = null;
+    let currentItemPhotos = {}; // key: `${dimIdx}_${itemIdx}`
 
-    // ==================== RENDER FUNCTIONS (same as before) ====================
-    function showScreen(screenId) { /* ... same as previous implementation ... */ }
-    function updateProtocolsList() { /* ... same ... */ }
-    function showProtocolDetail(protocolId) { /* ... same ... */ }
-    function renderRatingSection(protocolId) { /* ... same ... */ }
-    function collectRatings() { /* ... same ... */ }
-    function updateDashboard() { /* ... same ... */ }
-    function updateReportsList() { /* ... same ... */ }
-    function updateProfile() { /* ... same ... */ }
-    function populateProtocolSelect() { /* ... same ... */ }
+    // ==================== RENDER FUNCTIONS ====================
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen-container > .screen').forEach(s => s.classList.remove('active'));
+        if (screenId === 'login') {
+            document.getElementById('login-screen').classList.add('active');
+            document.getElementById('bottom-nav').style.display = 'none';
+        } else {
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById(screenId + '-screen').classList.add('active');
+            document.getElementById('bottom-nav').style.display = 'flex';
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.dataset.screen === screenId) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+        }
+    }
 
-    // ==================== PHOTO HANDLING WITH PRE-SIGNED URL ====================
-    document.getElementById('photo-input').addEventListener('change', async function(e) {
-        const preview = document.getElementById('photo-preview');
-        preview.innerHTML = '';
-        photosArray = [];
-        const files = Array.from(e.target.files);
-        // For demo, we'll limit to 3 photos
-        for (let i = 0; i < Math.min(files.length, 3); i++) {
-            const file = files[i];
-            // 1. Get pre-signed URL from backend
-            const { url, key } = await api.getPhotoUploadUrl(
-                currentAssessmentId, 
-                getCurrentDimensionId(), // need function to get current dimension
-                file.name,
-                file.type
-            );
-            // 2. Upload file directly to S3 (using fetch)
-            // In real app: fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
-            console.log(`Uploading ${file.name} to ${url}`);
-            // 3. After success, confirm
-            await api.confirmPhotoUpload(currentAssessmentId, getCurrentDimensionId(), key);
-            
-            // For preview, we'll use a local object URL
+    function updateDashboard() {
+        document.getElementById('user-name').innerText = currentUser?.name || 'Inspector';
+        const recent = inspections.slice(-3).reverse();
+        const list = document.getElementById('recent-list');
+        list.innerHTML = recent.length ? recent.map(i => `<li><i class="fas fa-home" style="color:#FFD700;"></i> ${i.propertyAddress || 'Unknown'} – ${new Date(i.createdAt).toLocaleDateString()}</li>`).join('') : '<li>No inspections yet</li>';
+        document.getElementById('month-count').innerText = inspections.filter(i => new Date(i.createdAt).getMonth() === new Date().getMonth()).length;
+    }
+
+    function updateReportsList() {
+        const container = document.getElementById('reports-list');
+        if (inspections.length === 0) {
+            container.innerHTML = '<p class="card">No saved reports.</p>';
+            return;
+        }
+        container.innerHTML = inspections.map((insp, index) => `
+            <div class="card" style="padding:12px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span><i class="fas fa-map-pin"></i> ${insp.propertyAddress || 'N/A'}</span>
+                    <span>${new Date(insp.createdAt).toLocaleDateString()}</span>
+                </div>
+                <p>${insp.propertyType || 'House'}, ${insp.size || '?'} sq ft</p>
+                <button class="btn btn-secondary view-report-btn" data-index="${index}" style="padding:6px; font-size:0.9rem;">View PDF</button>
+                <button class="btn delete-report-btn" data-index="${index}" style="padding:6px; background:#b22222;">Delete</button>
+            </div>
+        `).join('');
+        document.querySelectorAll('.view-report-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.target.dataset.index;
+                generatePDF(inspections[idx], true);
+            });
+        });
+        document.querySelectorAll('.delete-report-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.target.dataset.index;
+                inspections.splice(idx, 1);
+                saveLocalData();
+                updateReportsList();
+                updateDashboard();
+            });
+        });
+    }
+
+    function updateProfile() {
+        document.getElementById('profile-email').innerText = currentUser?.email || '';
+        document.getElementById('sub-tier').innerText = currentUser?.tier === 'pro' ? 'Pro (unlimited)' : 'Freemium (3 protocols)';
+    }
+
+    function populateProtocolSelect() {
+        const select = document.getElementById('inspection-protocol');
+        select.innerHTML = '';
+        protocols.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = `${p.name} (${p.tier})`;
+            select.appendChild(option);
+        });
+        select.addEventListener('change', (e) => {
+            renderRatingSection(parseInt(e.target.value));
+        });
+        renderRatingSection(parseInt(select.value));
+    }
+
+    function renderRatingSection(protocolId) {
+        const protocol = protocols.find(p => p.id === protocolId);
+        if (!protocol || !protocol.dimensions) return;
+        const container = document.getElementById('rating-section');
+        let html = '<h4>Rate Assessment Items (0-10)</h4>';
+        protocol.dimensions.forEach((dim, dimIdx) => {
+            html += `<div class="dimension-rating"><strong>${dim.name}</strong>`;
+            if (dim.items && dim.items.length) {
+                dim.items.forEach((item, itemIdx) => {
+                    const itemId = `rating_${dimIdx}_${itemIdx}`;
+                    html += `<div class="rating-item" id="item-${dimIdx}-${itemIdx}">`;
+                    html += `<div class="rating-item-header"><span>${item}</span> <input type="number" min="0" max="10" step="1" value="5" id="${itemId}"></div>`;
+                    html += `<div class="item-photos" id="photo-area-${dimIdx}-${itemIdx}">`;
+                    html += `<div class="photo-grid" id="photo-grid-${dimIdx}-${itemIdx}"></div>`;
+                    html += `<button class="add-photo-btn" data-dim="${dimIdx}" data-item="${itemIdx}"><i class="fas fa-camera"></i> Add Photos (max 3)</button>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                });
+            } else {
+                html += '<p>No items defined.</p>';
+            }
+            html += '</div>';
+        });
+        container.innerHTML = html;
+
+        document.querySelectorAll('.add-photo-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const dimIdx = e.target.dataset.dim;
+                const itemIdx = e.target.dataset.item;
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.multiple = true;
+                input.onchange = (event) => handleItemPhotoSelect(event, dimIdx, itemIdx);
+                input.click();
+            });
+        });
+    }
+
+    function handleItemPhotoSelect(event, dimIdx, itemIdx) {
+        const files = Array.from(event.target.files);
+        const key = `${dimIdx}_${itemIdx}`;
+        if (!currentItemPhotos[key]) currentItemPhotos[key] = [];
+        const remainingSlots = 3 - currentItemPhotos[key].length;
+        const filesToAdd = files.slice(0, remainingSlots);
+        filesToAdd.forEach(file => {
             const reader = new FileReader();
-            reader.onload = (ev) => {
-                const photoObj = { file, dataURL: ev.target.result, s3Key: key, annotatedDataURL: null };
-                photosArray.push(photoObj);
-                const container = document.createElement('div');
-                container.className = 'photo-thumb-container';
-                container.innerHTML = `<img src="${ev.target.result}" class="photo-thumb"><div class="annotate-btn" data-index="${i}">Annotate</div>`;
-                preview.appendChild(container);
-                container.querySelector('.annotate-btn').addEventListener('click', () => annotatePhoto(i));
+            reader.onload = (e) => {
+                const photoObj = {
+                    dataURL: e.target.result,
+                    annotatedDataURL: null,
+                    file
+                };
+                currentItemPhotos[key].push(photoObj);
+                renderItemPhotos(dimIdx, itemIdx);
             };
             reader.readAsDataURL(file);
+        });
+    }
+
+    function renderItemPhotos(dimIdx, itemIdx) {
+        const key = `${dimIdx}_${itemIdx}`;
+        const photos = currentItemPhotos[key] || [];
+        const grid = document.getElementById(`photo-grid-${dimIdx}-${itemIdx}`);
+        if (!grid) return;
+        grid.innerHTML = '';
+        photos.forEach((photo, idx) => {
+            const container = document.createElement('div');
+            container.className = 'photo-thumb-container';
+            container.innerHTML = `<img src="${photo.annotatedDataURL || photo.dataURL}" class="photo-thumb"><div class="annotate-btn" data-dim="${dimIdx}" data-item="${itemIdx}" data-photo="${idx}">Annotate</div>`;
+            grid.appendChild(container);
+        });
+        grid.querySelectorAll('.annotate-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const d = e.target.dataset.dim;
+                const i = e.target.dataset.item;
+                const p = e.target.dataset.photo;
+                annotatePhoto(d, i, p);
+            });
+        });
+    }
+
+    let currentAnnotation = { dimIdx: null, itemIdx: null, photoIdx: null };
+    function annotatePhoto(dimIdx, itemIdx, photoIdx) {
+        currentAnnotation = { dimIdx, itemIdx, photoIdx };
+        const key = `${dimIdx}_${itemIdx}`;
+        const photo = currentItemPhotos[key][photoIdx];
+        const canvas = document.getElementById('annotation-canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = photo.dataURL;
+        document.getElementById('annotation-modal').classList.add('show');
+    }
+
+    document.getElementById('tool-save').addEventListener('click', () => {
+        const canvas = document.getElementById('annotation-canvas');
+        const annotatedDataURL = canvas.toDataURL('image/jpeg');
+        const { dimIdx, itemIdx, photoIdx } = currentAnnotation;
+        if (dimIdx !== null) {
+            const key = `${dimIdx}_${itemIdx}`;
+            if (currentItemPhotos[key] && currentItemPhotos[key][photoIdx]) {
+                currentItemPhotos[key][photoIdx].annotatedDataURL = annotatedDataURL;
+                renderItemPhotos(dimIdx, itemIdx);
+            }
         }
+        document.getElementById('annotation-modal').classList.remove('show');
     });
 
-    // Annotation modal logic (same as before, but after saving we should upload annotated version)
-    function annotatePhoto(index) { /* ... same canvas setup ... */ }
-    // After annotation, we would call api.getPhotoUploadUrl again for annotated version, then upload.
+    document.getElementById('tool-cancel').addEventListener('click', () => {
+        document.getElementById('annotation-modal').classList.remove('show');
+    });
 
-    // ==================== REPORT GENERATION (client-side) ====================
     function generatePDF(inspectionData, download = true) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -650,10 +759,9 @@
         doc.setFontSize(14);
         doc.text('Inspection Report', 20, 40);
         doc.setFontSize(11);
-        doc.text(`Address: ${inspectionData.address || 'N/A'}`, 20, 50);
-        doc.text(`Type: ${inspectionData.type || 'House'} | Size: ${inspectionData.size || '?'} sq ft | Age: ${inspectionData.age || '?'} years`, 20, 60);
-        doc.text(`Protocol: ${inspectionData.protocolName || 'Standard'}`, 20, 70);
-        doc.text(`Date: ${inspectionData.date || new Date().toLocaleDateString()}`, 20, 80);
+        doc.text(`Address: ${inspectionData.propertyAddress || 'N/A'}`, 20, 50);
+        doc.text(`Type: ${inspectionData.propertyType || 'House'} | Size: ${inspectionData.size || '?'} sq ft | Age: ${inspectionData.age || '?'} years`, 20, 60);
+        doc.text(`Date: ${new Date(inspectionData.createdAt).toLocaleDateString()}`, 20, 80);
         doc.text('Assessment Ratings:', 20, 100);
         if (inspectionData.ratings && inspectionData.ratings.length) {
             let y = 110;
@@ -664,139 +772,36 @@
         } else {
             doc.text('No ratings provided.', 20, 110);
         }
-        doc.text(`Photos: ${inspectionData.photos ? inspectionData.photos.length : 0} captured`, 20, 200);
+        doc.text('Photos captured per item.', 20, 200);
         doc.text('© Property Inspection Profit System™ · By Ali Sekhr', 105, 280, { align: 'center' });
         if (download) doc.save(`inspection_${Date.now()}.pdf`);
     }
 
     // ==================== EVENT LISTENERS ====================
-    // Login / Register
     document.getElementById('login-btn').addEventListener('click', async () => {
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-password').value;
-        try {
-            const user = await api.login(email, pass);
-            currentUser = user;
-            localStorage.setItem(STORAGE_USER, JSON.stringify(user));
-            showScreen('dashboard');
-            updateDashboard();
-            updateProtocolsList();
-            updateReportsList();
-            updateProfile();
-            populateProtocolSelect();
-        } catch (e) {
-            alert('Login failed: ' + e.message);
-        }
-    });
-    document.getElementById('register-btn').addEventListener('click', async () => {
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-password').value;
-        try {
-            const user = await api.register(email, pass);
-            currentUser = user;
-            localStorage.setItem(STORAGE_USER, JSON.stringify(user));
-            showScreen('dashboard');
-            updateDashboard();
-            updateProtocolsList();
-            updateReportsList();
-            updateProfile();
-            populateProtocolSelect();
-        } catch (e) {
-            alert('Registration failed: ' + e.message);
-        }
+        currentUser = { id: 1, email, name: email.split('@')[0], tier: 'freemium' };
+        localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
+        showScreen('dashboard');
+        updateDashboard();
+        updateReportsList();
+        updateProfile();
+        populateProtocolSelect();
     });
 
-    // Navigation
+    document.getElementById('register-btn').addEventListener('click', async () => {
+        document.getElementById('login-btn').click();
+    });
+
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             const screen = item.dataset.screen;
             showScreen(screen);
-            if (screen === 'protocols') { updateProtocolsList(); document.getElementById('protocols-list-view').style.display = 'block'; document.getElementById('protocol-detail-view').style.display = 'none'; }
+            if (screen === 'protocols') { 
+                document.getElementById('protocols-list-view').style.display = 'block';
+                document.getElementById('protocol-detail-view').style.display = 'none';
+            }
             if (screen === 'reports') updateReportsList();
             if (screen === 'profile') updateProfile();
-            if (screen === 'new-inspection') { populateProtocolSelect(); photosArray = []; document.getElementById('photo-preview').innerHTML = ''; }
-        });
-    });
-
-    document.getElementById('quick-new').addEventListener('click', () => showScreen('new-inspection'));
-    document.getElementById('quick-reports').addEventListener('click', () => showScreen('reports'));
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        currentUser = null;
-        localStorage.removeItem(STORAGE_USER);
-        localStorage.removeItem(STORAGE_TOKEN);
-        showScreen('login');
-    });
-
-    // Generate report button
-    document.getElementById('generate-report-btn').addEventListener('click', async () => {
-        const address = document.getElementById('prop-address').value;
-        const type = document.getElementById('prop-type').value;
-        const size = document.getElementById('prop-size').value;
-        const age = document.getElementById('prop-age').value;
-        const protocolId = parseInt(document.getElementById('inspection-protocol').value);
-        const protocol = protocols.find(p => p.id === protocolId);
-        // Check if allowed (freemium first 3)
-        if (!protocol.free) {
-            alert('This protocol is locked in Freemium. Upgrade to Pro to use it.');
-            return;
-        }
-        const ratings = collectRatings();
-        // Create assessment via API
-        const assessmentData = {
-            propertyAddress: address,
-            propertyType: type,
-            inspectionDate: new Date().toISOString(),
-            // include ratings, photos etc.
-        };
-        const newAssessment = await api.createAssessment(assessmentData);
-        // Save ratings one by one (or batch)
-        // ...
-        // Generate PDF locally
-        const inspection = {
-            address, type, size, age,
-            protocolName: protocol.name,
-            date: new Date().toLocaleDateString(),
-            ratings,
-            photos: photosArray.map(p => p.s3Key) // just keys
-        };
-        generatePDF(inspection, true);
-        // Update local list
-        inspections.push({ ...inspection, id: newAssessment.id });
-        saveLocalData();
-        updateDashboard();
-        updateReportsList();
-        // Clear form
-        document.getElementById('prop-address').value = '';
-        document.getElementById('photo-preview').innerHTML = '';
-        document.getElementById('rating-section').innerHTML = '';
-        alert('Inspection saved and PDF generated.');
-    });
-
-    // Upgrade modal (placeholder)
-    const upgradeModal = document.getElementById('upgrade-modal');
-    document.getElementById('modal-close').addEventListener('click', () => upgradeModal.classList.remove('show'));
-    document.getElementById('modal-upgrade').addEventListener('click', () => {
-        alert('Upgrade coming soon!');
-        upgradeModal.classList.remove('show');
-    });
-
-    // Protocol lock handling
-    window.showPurchaseModal = (protocolId, protocolName) => {
-        upgradeModal.classList.add('show');
-    };
-
-    // Initialize
-    if (currentUser) {
-        showScreen('dashboard');
-        updateDashboard();
-        updateProtocolsList();
-        updateReportsList();
-        updateProfile();
-        populateProtocolSelect();
-    } else {
-        showScreen('login');
-    }
-})();
-</script>
-</body>
-</html>
+            if (screen === 'new-inspection') { populateProtocolSelect
